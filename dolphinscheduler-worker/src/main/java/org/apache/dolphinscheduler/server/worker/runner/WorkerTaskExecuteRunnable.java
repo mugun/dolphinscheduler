@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -232,7 +233,22 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         logger.info("Success initialized task plugin instance success");
 
         task.getParameters().setVarPool(taskExecutionContext.getVarPool());
-        logger.info("Success set taskVarPool: {}", taskExecutionContext.getVarPool());
+        String temp =  taskExecutionContext.getVarPool();
+        List<Map> tempList=JSONUtils.toList(temp, Map.class);
+        for (Map<Object,Object> tempMap:tempList){
+            for(Map.Entry<Object,Object>entry:tempMap.entrySet()){
+                try{
+                    String keyword = String.valueOf(entry.getKey());
+                    if(keyword.toLowerCase().contains("password")){
+                        tempMap.put(entry.getKey(),"******");
+                    }
+                }
+                catch (Exception e){
+                    continue;
+                }
+            }
+        }
+        logger.info("Success set taskVarPool: {}", JSONUtils.toJsonString(tempList));
 
     }
 
